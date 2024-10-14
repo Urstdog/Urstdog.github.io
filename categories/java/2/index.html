@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>synchronized锁和@Transactional注解失效 | Urstdog</title><meta name="author" content="Urstdog"><meta name="copyright" content="Urstdog"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="1、synchronized锁12345678910111213141516171819202122232425262728public Result seckillVouocher(Long voucherId) &#123;        &#x2F;&#x2F;查询秒杀优惠券        SeckillVoucher seckillVoucher &#x3D; seckillVoucherService.getById">
+<meta property="og:type" content="article">
+<meta property="og:title" content="synchronized锁和@Transactional注解失效">
+<meta property="og:url" content="http://example.com/categories/java/2/index.html">
+<meta property="og:site_name" content="Urstdog">
+<meta property="og:description" content="1、synchronized锁12345678910111213141516171819202122232425262728public Result seckillVouocher(Long voucherId) &#123;        &#x2F;&#x2F;查询秒杀优惠券        SeckillVoucher seckillVoucher &#x3D; seckillVoucherService.getById">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg">
+<meta property="article:published_time" content="2024-10-14T13:27:39.856Z">
+<meta property="article:modified_time" content="2024-10-14T13:33:45.212Z">
+<meta property="article:author" content="Urstdog">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/categories/java/2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?757d1c0a5dbe8436ba293fb28858072e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":350},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'synchronized锁和@Transactional注解失效',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-10-14 21:33:45'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/self/Kimbiedark.css"><meta name="generator" content="Hexo 7.3.0"></head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Urstdog"><span class="site-name">Urstdog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">synchronized锁和@Transactional注解失效</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-14T13:27:39.856Z" title="发表于 2024-10-14 21:27:39">2024-10-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-14T13:33:45.212Z" title="更新于 2024-10-14 21:33:45">2024-10-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/">java</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="synchronized锁和@Transactional注解失效"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="1、synchronized锁"><a href="#1、synchronized锁" class="headerlink" title="1、synchronized锁"></a>1、synchronized锁</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Result <span class="hljs-title function_">seckillVouocher</span><span class="hljs-params">(Long voucherId)</span> &#123;<br>        <span class="hljs-comment">//查询秒杀优惠券</span><br>        <span class="hljs-type">SeckillVoucher</span> <span class="hljs-variable">seckillVoucher</span> <span class="hljs-operator">=</span> seckillVoucherService.getById(voucherId);<br>        <span class="hljs-comment">//判断抢购时间是否开始</span><br>        <span class="hljs-type">LocalDateTime</span> <span class="hljs-variable">beginTime</span> <span class="hljs-operator">=</span> seckillVoucher.getBeginTime();<br>        <span class="hljs-comment">//现在时间 2024 9-19</span><br>        <span class="hljs-comment">//beginTime 2024 9-20</span><br>        <span class="hljs-comment">//after 相当于 大于</span><br>        <span class="hljs-keyword">if</span> (beginTime.isAfter(LocalDateTime.now())) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;秒杀尚未开始&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//判断是否结束</span><br>        <span class="hljs-type">LocalDateTime</span> <span class="hljs-variable">endTime</span> <span class="hljs-operator">=</span> seckillVoucher.getEndTime();<br>        <span class="hljs-keyword">if</span> (endTime.isBefore(LocalDateTime.now())) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;秒杀已经结束&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//查询优惠券库存是否充足</span><br>        <span class="hljs-keyword">if</span> (seckillVoucher.getStock() &lt; <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;库存不足&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//获取用户id</span><br>        <span class="hljs-type">Long</span> <span class="hljs-variable">userId</span> <span class="hljs-operator">=</span> UserHolder.getUser().getId();<br>        <span class="hljs-keyword">synchronized</span> (userId.toString().intern()) &#123;<br>        <span class="hljs-type">IVoucherOrderService</span> <span class="hljs-variable">proxy</span> <span class="hljs-operator">=</span> (IVoucherOrderService) AopContext.currentProxy();<br>        <span class="hljs-keyword">return</span> proxy.createVoucherOrder(voucherId);<br><br>        &#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="2、为什么使用userId-toString-intern-，而不是userId-toString-？"><a href="#2、为什么使用userId-toString-intern-，而不是userId-toString-？" class="headerlink" title="2、为什么使用userId.toString().intern()，而不是userId.toString()？"></a>2、为什么使用userId.toString().intern()，而不是userId.toString()？</h2><blockquote>
+<ol>
+<li><code>userId.toString()</code><ul>
+<li><code>toString()</code>方法返回<code>userId</code>对象的字符串表示。</li>
+<li>每次调用<code>userId.toString()</code>时，都会创建一个新的字符串对象（除非<code>userId</code>的<code>toString()</code>方法被重写并缓存了结果）。</li>
+<li>使用不同的字符串对象作为锁对象可能会导致多个线程同时进入同步块，因为每个线程可能持有不同的字符串对象作为锁。</li>
+</ul>
+</li>
+<li><code>userId.toString().intern()</code><ul>
+<li><code>intern()</code>方法是<code>String</code>类的一个本地方法，它确保所有具有相同字符序列的字符串字面量都使用同一个实例。</li>
+<li>如果字符串池（String Pool）中已经存在一个等于此<code>String</code>对象的字符串，则返回代表池中这个字符串的<code>String</code>对象的引用。</li>
+<li>如果池中不存在这样的字符串，则将此<code>String</code>对象添加到池中，并返回此<code>String</code>对象的引用。</li>
+<li>这意味着无论<code>userId.toString()</code>生成什么字符串，调用<code>.intern()</code>后，所有相同的字符串值都会共享同一个字符串对象。</li>
+<li>因此，使用<code>userId.toString().intern()</code>作为锁对象可以确保对于具有相同<code>userId</code>值的所有线程，它们都会尝试获取同一个锁对象，从而正确地进行同步。</li>
+</ul>
+</li>
+</ol>
+<p>综上所述，使用<code>userId.toString().intern()</code>作为锁对象更为安全，因为它确保了所有具有相同<code>userId</code>值的线程都会尝试获取相同的锁。而直接使用<code>userId.toString()</code>作为锁对象则可能由于每次调用都返回不同的字符串对象而导致同步失效。 </p>
+</blockquote>
+<h2 id="3、-Transactional注解失效"><a href="#3、-Transactional注解失效" class="headerlink" title="3、@Transactional注解失效"></a>3、@Transactional注解失效</h2><blockquote>
+<p>1、如果先释放锁，再提交事务，可能在释放锁之后,此时事务还没有提交，因为@Transactional在方法结束后提交，其他线程获得到锁，造成并发问题</p>
+<p>2、先提交事务，再释放锁，确保事务提交，所以synchronized加在整个方法上，锁住整个方法，方法结束，事务提交</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Transactional</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createVoucherOrder</span><span class="hljs-params">(VoucherOrder voucherOrder)</span> &#123;<br>    <span class="hljs-comment">//一位用户只能购买一单</span><br>    <span class="hljs-type">Long</span> <span class="hljs-variable">userId</span> <span class="hljs-operator">=</span> voucherOrder.getUserId();<br>    <span class="hljs-comment">//锁加在方法内部，会造成并发问题</span><br>    <span class="hljs-comment">//synchronized (userId.toString().intern()) &#123;</span><br>    <span class="hljs-type">Integer</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> query()<br>            .eq(<span class="hljs-string">&quot;user_id&quot;</span>, userId)<br>            .eq(<span class="hljs-string">&quot;voucher_id&quot;</span>, voucherOrder.getVoucherId())<br>            .count();<br>    <span class="hljs-keyword">if</span> (count &gt; <span class="hljs-number">0</span>) &#123;<br>        log.error(<span class="hljs-string">&quot;用户已经购买过一次了!&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <span class="hljs-comment">//优惠券 - 1</span><br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">success</span> <span class="hljs-operator">=</span> seckillVoucherService.update()<br>            .setSql(<span class="hljs-string">&quot;stock = stock - 1&quot;</span>)<br>            .eq(<span class="hljs-string">&quot;voucher_id&quot;</span>, voucherOrder.getVoucherId())<br>            <span class="hljs-comment">//比对之前查到的库存,如果一直才进行修改(乐观锁)</span><br>            .gt(<span class="hljs-string">&quot;stock&quot;</span>, <span class="hljs-number">0</span>)<br>            .update();<br>    <span class="hljs-keyword">if</span> (!success) &#123;<br>        log.error(<span class="hljs-string">&quot;库存不足!&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <span class="hljs-comment">//写入数据库</span><br>    save(voucherOrder);<br>    <span class="hljs-comment">//&#125;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一个方法调用带有@Transactional注解的方法，直接调用得到的是当前对象，而Spring事务是用aop代理对象实现的，所以事务会失效</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//如果用createVoucherOrder(voucherId)；不是代理对象调用，而是目标对象调用，造成事务失效</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如何获取到代理对象：IVoucherOrderService proxy &#x3D; (IVoucherOrderService) AopContext.currentProxy();</p>
+</blockquote>
+<h3 id="1、导入依赖"><a href="#1、导入依赖" class="headerlink" title="1、导入依赖"></a>1、导入依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!--动态代理的方式--&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.aspectj<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>aspectjweaver<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4、启动类加注解"><a href="#4、启动类加注解" class="headerlink" title="4、启动类加注解"></a>4、启动类加注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@EnableAspectJAutoProxy(exposeProxy = true)</span><span class="hljs-comment">//暴露代理对象</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="4、分布式锁"><a href="#4、分布式锁" class="headerlink" title="4、分布式锁"></a>4、分布式锁</h2><ul>
+<li><code>问题</code>：集群模式下，即项目部署到多台服务器上，多个jvm之间，synchronized锁是不共享的，每个jvm都有一把锁。</li>
+<li><code>解决方法</code>：多个jvm中共享同一把锁</li>
+</ul>
+<blockquote>
+<p>redis实现分布式锁, 改进</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Result <span class="hljs-title function_">seckillVouocher</span><span class="hljs-params">(Long voucherId)</span> &#123;<br>        <span class="hljs-comment">//查询秒杀优惠券</span><br>        <span class="hljs-type">SeckillVoucher</span> <span class="hljs-variable">seckillVoucher</span> <span class="hljs-operator">=</span> seckillVoucherService.getById(voucherId);<br>        <span class="hljs-comment">//判断抢购时间是否开始</span><br>        <span class="hljs-type">LocalDateTime</span> <span class="hljs-variable">beginTime</span> <span class="hljs-operator">=</span> seckillVoucher.getBeginTime();<br>        <span class="hljs-comment">//现在时间 2024 9-19</span><br>        <span class="hljs-comment">//beginTime 2024 9-20</span><br>        <span class="hljs-comment">//after 相当于 大于</span><br>        <span class="hljs-keyword">if</span> (beginTime.isAfter(LocalDateTime.now())) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;秒杀尚未开始&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//判断是否结束</span><br>        <span class="hljs-type">LocalDateTime</span> <span class="hljs-variable">endTime</span> <span class="hljs-operator">=</span> seckillVoucher.getEndTime();<br>        <span class="hljs-keyword">if</span> (endTime.isBefore(LocalDateTime.now())) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;秒杀已经结束&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//查询优惠券库存是否充足</span><br>        <span class="hljs-keyword">if</span> (seckillVoucher.getStock() &lt; <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;库存不足&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">//改进: 基于redis实现分布式锁</span><br>        <span class="hljs-comment">//1.创建锁对象</span><br>        <span class="hljs-comment">//SimpleRedisLock lock = new SimpleRedisLock(&quot;order:&quot; + userId, stringRedisTemplate);</span><br>        <span class="hljs-type">RLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> redissonClient.getLock(<span class="hljs-string">&quot;lock:order:&quot;</span> + userId);<br>        <span class="hljs-comment">//2.获取锁</span><br>        <span class="hljs-comment">//无参数 : 不等待直接返回,锁过期时间30秒</span><br>        <span class="hljs-type">boolean</span> <span class="hljs-variable">isLock</span> <span class="hljs-operator">=</span> lock.tryLock();<br>        <span class="hljs-comment">//3.获取锁失败,返回错误信息</span><br>        <span class="hljs-keyword">if</span> (!isLock) &#123;<br>            <span class="hljs-keyword">return</span> Result.fail(<span class="hljs-string">&quot;不允许重复下单&quot;</span>);<br>           &#125;<br>        <span class="hljs-comment">//4.获取成功</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">IVoucherOrderService</span> <span class="hljs-variable">proxy</span> <span class="hljs-operator">=</span> (IVoucherOrderService) AopContext.currentProxy();<br>            <span class="hljs-keyword">return</span> proxy.createVoucherOrder(voucherId);<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-comment">//5.释放锁</span><br>            lock.unlock();<br>          &#125;    <br>&#125; <br><br></code></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Urstdog</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/categories/java/2/">http://example.com/categories/java/2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Urstdog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java/">java</a></div><div class="post_share"><div class="social-share" data-image="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/categories/redis/4/" title="Redis存储java对象"><img class="cover" src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Redis存储java对象</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/categories/java/1/" title="Map接口接口介绍"><img class="cover" src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-27</div><div class="title">Map接口接口介绍</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Urstdog</div><div class="author-info__description">Hello World!</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Urstdog"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">他强任他强，清风拂山岗！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81synchronized%E9%94%81"><span class="toc-text">1、synchronized锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8userId-toString-intern-%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AFuserId-toString-%EF%BC%9F"><span class="toc-text">2、为什么使用userId.toString().intern()，而不是userId.toString()？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81-Transactional%E6%B3%A8%E8%A7%A3%E5%A4%B1%E6%95%88"><span class="toc-text">3、@Transactional注解失效</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%AF%BC%E5%85%A5%E4%BE%9D%E8%B5%96"><span class="toc-text">1、导入依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E5%90%AF%E5%8A%A8%E7%B1%BB%E5%8A%A0%E6%B3%A8%E8%A7%A3"><span class="toc-text">4、启动类加注解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="toc-text">4、分布式锁</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/categories/java/2/" title="synchronized锁和@Transactional注解失效"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="synchronized锁和@Transactional注解失效"/></a><div class="content"><a class="title" href="/categories/java/2/" title="synchronized锁和@Transactional注解失效">synchronized锁和@Transactional注解失效</a><time datetime="2024-10-14T13:27:39.856Z" title="发表于 2024-10-14 21:27:39">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/4/" title="Redis存储java对象"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redis存储java对象"/></a><div class="content"><a class="title" href="/categories/redis/4/" title="Redis存储java对象">Redis存储java对象</a><time datetime="2024-10-14T13:27:08.717Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/5/" title="Redission"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redission"/></a><div class="content"><a class="title" href="/categories/redis/5/" title="Redission">Redission</a><time datetime="2024-10-14T13:27:08.700Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/3/" title="Lua脚本"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lua脚本"/></a><div class="content"><a class="title" href="/categories/redis/3/" title="Lua脚本">Lua脚本</a><time datetime="2024-10-14T13:27:08.684Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/2/" title="Redis优化秒杀"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redis优化秒杀"/></a><div class="content"><a class="title" href="/categories/redis/2/" title="Redis优化秒杀">Redis优化秒杀</a><time datetime="2024-10-14T13:27:08.668Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Urstdog</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
