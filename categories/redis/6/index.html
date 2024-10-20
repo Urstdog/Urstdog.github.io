@@ -1,0 +1,293 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Redis搭建主从框架 | Urstdog</title><meta name="author" content="Urstdog"><meta name="copyright" content="Urstdog"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="1、Redis主从框架结构主节点负责写操作，从结点负责读操作  2、如何搭建主从框架？ 1、在同一台Redis服务器里，相同ip地址和用不同端口实现多台Redis实例 2、多台Redis服务器里，不同ip地址和6379端口实现多台Redis实例  1、不同端口搭建Redis主从框架1、Centos7安装redis配置yum源 1vim &#x2F;etc&#x2F;yum.repos.d&#x2F;CentOS-Base.re">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis搭建主从框架">
+<meta property="og:url" content="http://example.com/categories/redis/6/index.html">
+<meta property="og:site_name" content="Urstdog">
+<meta property="og:description" content="1、Redis主从框架结构主节点负责写操作，从结点负责读操作  2、如何搭建主从框架？ 1、在同一台Redis服务器里，相同ip地址和用不同端口实现多台Redis实例 2、多台Redis服务器里，不同ip地址和6379端口实现多台Redis实例  1、不同端口搭建Redis主从框架1、Centos7安装redis配置yum源 1vim &#x2F;etc&#x2F;yum.repos.d&#x2F;CentOS-Base.re">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg">
+<meta property="article:published_time" content="2024-10-20T16:40:08.210Z">
+<meta property="article:modified_time" content="2024-10-20T16:45:34.575Z">
+<meta property="article:author" content="Urstdog">
+<meta property="article:tag" content="Redis搭建主从框架">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/categories/redis/6/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?757d1c0a5dbe8436ba293fb28858072e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":350},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Redis搭建主从框架',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-10-21 00:45:34'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/self/Kimbiedark.css"><meta name="generator" content="Hexo 7.3.0"></head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Urstdog"><span class="site-name">Urstdog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Redis搭建主从框架</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-20T16:40:08.210Z" title="发表于 2024-10-21 00:40:08">2024-10-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-20T16:45:34.575Z" title="更新于 2024-10-21 00:45:34">2024-10-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/redis/">redis</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Redis搭建主从框架"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="1、Redis主从框架结构"><a href="#1、Redis主从框架结构" class="headerlink" title="1、Redis主从框架结构"></a>1、Redis主从框架结构</h2><p>主节点负责写操作，从结点负责读操作</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/111.png"></p>
+<h2 id="2、如何搭建主从框架？"><a href="#2、如何搭建主从框架？" class="headerlink" title="2、如何搭建主从框架？"></a>2、如何搭建主从框架？</h2><blockquote>
+<p>1、在同一台Redis服务器里，相同ip地址和用不同端口实现多台Redis实例</p>
+<p>2、多台Redis服务器里，不同ip地址和6379端口实现多台Redis实例</p>
+</blockquote>
+<h3 id="1、不同端口搭建Redis主从框架"><a href="#1、不同端口搭建Redis主从框架" class="headerlink" title="1、不同端口搭建Redis主从框架"></a>1、不同端口搭建Redis主从框架</h3><h4 id="1、Centos7安装redis"><a href="#1、Centos7安装redis" class="headerlink" title="1、Centos7安装redis"></a>1、Centos7安装redis</h4><p>配置yum源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/yum.repos.d/CentOS-Base.repo<br></code></pre></td></tr></table></figure>
+
+<p>替换下面</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># CentOS-Base.repo</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># The mirror system uses the connecting IP address of the client and the</span><br><span class="hljs-comment"># update status of each mirror to pick mirrors that are updated to and</span><br><span class="hljs-comment"># geographically close to the client.  You should use this for CentOS updates</span><br><span class="hljs-comment"># unless you are manually picking other mirrors.</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># If the mirrorlist= does not work for you, as a fall back you can try the </span><br><span class="hljs-comment"># remarked out baseurl= line instead.</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment">#</span><br> <br><span class="hljs-attr">[base]</span><br><span class="hljs-attr">name</span>=<span class="hljs-string">CentOS-$releasever - Base - mirrors.aliyun.com</span><br><span class="hljs-attr">failovermethod</span>=<span class="hljs-string">priority</span><br><span class="hljs-attr">baseurl</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/$releasever/os/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.aliyuncs.com/centos/$releasever/os/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.cloud.aliyuncs.com/centos/$releasever/os/$basearch/</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">gpgkey</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7</span><br><span class="hljs-comment"> </span><br><span class="hljs-comment">#released updates</span><br><span class="hljs-attr">[updates]</span><br><span class="hljs-attr">name</span>=<span class="hljs-string">CentOS-$releasever - Updates - mirrors.aliyun.com</span><br><span class="hljs-attr">failovermethod</span>=<span class="hljs-string">priority</span><br><span class="hljs-attr">baseurl</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/$releasever/updates/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.aliyuncs.com/centos/$releasever/updates/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.cloud.aliyuncs.com/centos/$releasever/updates/$basearch/</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">gpgkey</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7</span><br><span class="hljs-comment"> </span><br><span class="hljs-comment">#additional packages that may be useful</span><br><span class="hljs-attr">[extras]</span><br><span class="hljs-attr">name</span>=<span class="hljs-string">CentOS-$releasever - Extras - mirrors.aliyun.com</span><br><span class="hljs-attr">failovermethod</span>=<span class="hljs-string">priority</span><br><span class="hljs-attr">baseurl</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/$releasever/extras/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.aliyuncs.com/centos/$releasever/extras/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.cloud.aliyuncs.com/centos/$releasever/extras/$basearch/</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">gpgkey</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7</span><br><span class="hljs-comment"> </span><br><span class="hljs-comment">#additional packages that extend functionality of existing packages</span><br><span class="hljs-attr">[centosplus]</span><br><span class="hljs-attr">name</span>=<span class="hljs-string">CentOS-$releasever - Plus - mirrors.aliyun.com</span><br><span class="hljs-attr">failovermethod</span>=<span class="hljs-string">priority</span><br><span class="hljs-attr">baseurl</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/$releasever/centosplus/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.aliyuncs.com/centos/$releasever/centosplus/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.cloud.aliyuncs.com/centos/$releasever/centosplus/$basearch/</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">enabled</span>=<span class="hljs-string">0</span><br><span class="hljs-attr">gpgkey</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7</span><br><span class="hljs-comment"> </span><br><span class="hljs-comment">#contrib - packages by Centos Users</span><br><span class="hljs-attr">[contrib]</span><br><span class="hljs-attr">name</span>=<span class="hljs-string">CentOS-$releasever - Contrib - mirrors.aliyun.com</span><br><span class="hljs-attr">failovermethod</span>=<span class="hljs-string">priority</span><br><span class="hljs-attr">baseurl</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/$releasever/contrib/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.aliyuncs.com/centos/$releasever/contrib/$basearch/</span><br>        <span class="hljs-attr">http</span>:<span class="hljs-string">//mirrors.cloud.aliyuncs.com/centos/$releasever/contrib/$basearch/</span><br><span class="hljs-attr">gpgcheck</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">enabled</span>=<span class="hljs-string">0</span><br><span class="hljs-attr">gpgkey</span>=<span class="hljs-string">http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7</span><br> <br></code></pre></td></tr></table></figure>
+
+<p>清理缓存</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum clean all<br></code></pre></td></tr></table></figure>
+
+<p>缓存重建</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum makecache<br></code></pre></td></tr></table></figure>
+
+<p>更新系统上所有已安装的软件包到最新版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum update<br></code></pre></td></tr></table></figure>
+
+<p>安装Redis依赖</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install -y gcc tcl<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/image-20241020233100342.png" alt="image-20241020233100342"></p>
+<p>解压</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -xzf redis-6.2.6.tar.gz<br></code></pre></td></tr></table></figure>
+
+<p>解压后文件</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/image-20241020233208522.png" alt="image-20241020233208522"></p>
+<p>进入 redis目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> redis-6.2.6<br></code></pre></td></tr></table></figure>
+
+<p>运行编译命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make &amp;&amp; make install<br></code></pre></td></tr></table></figure>
+
+<p>默认的安装路径是在 <code>/usr/local/bin</code>目录下：</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_23-35-30.png"></p>
+<p>启动Redis</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#1.在任意目录</span><br>redis-server<br><br><span class="hljs-comment">#2.指定配置文件启动</span><br><span class="hljs-built_in">cd</span> /usr/local/src/redis-6.2.6<br>redis-server redis.conf<br></code></pre></td></tr></table></figure>
+
+<h4 id="2、redis-conf-配置文件"><a href="#2、redis-conf-配置文件" class="headerlink" title="2、redis.conf 配置文件"></a>2、redis.conf 配置文件</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 允许访问的地址，默认是127.0.0.1，会导致只能在本地访问。修改为0.0.0.0则可以在任意IP访问，生产环境不要设置为0.0.0.0</span><br><span class="hljs-attr">bind</span> <span class="hljs-string">0.0.0.0</span><br><span class="hljs-comment"># 守护进程，修改为yes后即可后台运行</span><br><span class="hljs-attr">daemonize</span> <span class="hljs-string">yes </span><br><span class="hljs-comment"># 密码，设置后访问Redis必须输入密码</span><br><span class="hljs-attr">requirepass</span> <span class="hljs-string">123321</span><br><span class="hljs-comment"># 监听的端口</span><br><span class="hljs-attr">port</span> <span class="hljs-string">6379</span><br><span class="hljs-comment"># 工作目录，默认是当前目录，也就是运行redis-server时的命令，日志、持久化等文件会保存在这个目录</span><br><span class="hljs-attr">dir</span> <span class="hljs-string">.</span><br><span class="hljs-comment"># 数据库数量，设置为1，代表只使用1个库，默认有16个库，编号0~15</span><br><span class="hljs-attr">databases</span> <span class="hljs-string">1</span><br><span class="hljs-comment"># 设置redis能够使用的最大内存</span><br><span class="hljs-attr">maxmemory</span> <span class="hljs-string">512mb</span><br><span class="hljs-comment"># 日志文件，默认为空，不记录日志，可以指定日志文件名</span><br><span class="hljs-attr">logfile</span> <span class="hljs-string">&quot;redis.log&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>Redis安装完成后就自带了命令行客户端：redis-cli，使用方式如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sh">redis-cli [options] [commonds]<br></code></pre></td></tr></table></figure>
+
+<p>其中常见的options有：</p>
+<ul>
+<li><code>-h 127.0.0.1</code>：指定要连接的redis节点的IP地址，默认是127.0.0.1</li>
+<li><code>-p 6379</code>：指定要连接的redis节点的端口，默认是6379</li>
+<li><code>-a 123321</code>：指定redis的访问密码</li>
+</ul>
+<p>其中的commonds就是Redis的操作命令，例如：</p>
+<ul>
+<li><code>ping</code>：与redis服务端做心跳测试，服务端正常会返回<code>pong</code></li>
+</ul>
+<p>设置配置文件</p>
+<table>
+<thead>
+<tr>
+<th align="center">IP</th>
+<th align="center">PORT</th>
+<th align="center">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">192.168.189.131</td>
+<td align="center">7001</td>
+<td align="center">master</td>
+</tr>
+<tr>
+<td align="center">192.168.189.131</td>
+<td align="center">7002</td>
+<td align="center">slave</td>
+</tr>
+<tr>
+<td align="center">192.168.189.131</td>
+<td align="center">7003</td>
+<td align="center">slave</td>
+</tr>
+</tbody></table>
+<p>创建 7001、7002、7003 三个文件夹，并将redis.conf复制到这三个文件夹下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#进入 /usr/local/src 目录</span><br><span class="hljs-built_in">cd</span> /usr/local/src<br><span class="hljs-comment">#创建文件夹</span><br><span class="hljs-built_in">mkdir</span> 7001 7002 7003<br><span class="hljs-comment"># 复制redsi.conf到这三个文件夹下</span><br><span class="hljs-built_in">cp</span> redis-6.2.4/redis.conf 7001/redis.conf<br><span class="hljs-built_in">cp</span> redis-6.2.4/redis.conf 7002/redis.conf<br><span class="hljs-built_in">cp</span> redis-6.2.4/redis.conf 7003/redis.conf<br></code></pre></td></tr></table></figure>
+
+<p>修改对应port端口和redis.conf 配置文件目录</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_23-43-25.png"></p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_23-43-54.png"></p>
+<h4 id="3、启动这三个Redis实例"><a href="#3、启动这三个Redis实例" class="headerlink" title="3、启动这三个Redis实例"></a>3、启动这三个Redis实例</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 第1个</span><br>redis-server 7001/redis.conf<br><span class="hljs-comment"># 第2个</span><br>redis-server 7002/redis.conf<br><span class="hljs-comment"># 第3个</span><br>redis-server 7003/redis.conf<br></code></pre></td></tr></table></figure>
+
+<h4 id="4、配置主从关系"><a href="#4、配置主从关系" class="headerlink" title="4、配置主从关系"></a>4、配置主从关系</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#A,B 两个redis实例,如何让B成为A的从节点?</span><br><span class="hljs-comment">#进入B节点,执行 slaveof A的ip A的port</span><br><br>slaveof ip port<br>slaveof 192.168.189.131 3679<br><br>replicaof ip port<br><br><span class="hljs-comment">#slave 奴隶</span><br><span class="hljs-comment">#replica 复制品,副本</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 分别进入 7002 和 7003 的redis中执行</span><br>redis-cli -p 7002<br>salveof 192.168.189.131 7001<br><br>redis-cli -p 7003<br>salveof 192.168.189.131 7001<br></code></pre></td></tr></table></figure>
+
+<p>进入 主节点 master 7001Redis实例</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 连接 7001</span><br>redis-cli -p 7001<br><span class="hljs-comment"># 查看状态</span><br>info replication<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_20-49-03.png"></p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_20-56-53.png"></p>
+<h2 id="3、主从数据同步原理"><a href="#3、主从数据同步原理" class="headerlink" title="3、主从数据同步原理"></a>3、主从数据同步原理</h2><ol>
+<li><code>slave</code>结点发送增量同步请求，携带<code>replication ID</code>和 <code>offset</code></li>
+<li><code>master</code>结点接受到请求，通过 <code>replication ID</code>和 <code>offset</code>来判断是不是第一次请求</li>
+<li>是第一次请求的话，就拒绝增量同步请求，执行  <code>bgsave</code>，进行全量同步，开启一个子线程异步拷贝内存中所有数据到<code>RDB</code>文件中，然后把<code>RDB</code>文件发送给<code>slave</code>节点</li>
+<li><code>slave</code>结点删除所有旧的内存数据，加载<code>RDB</code>文件，将数据写入内存中</li>
+<li><code>master</code>在异步拷贝数据生成<code>RDB</code>文件期间，将执行的命令存放在<code>repl_baklog</code>中，并持续将log中的命令发送给<code>slave</code></li>
+<li><code>slave</code>接受到命令，保持与<code>master</code>节点的同步</li>
+</ol>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_21-13-23.png"></p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_21-10-45.png"></p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_21-45-23.png"></p>
+<h2 id="4、分析同步日志"><a href="#4、分析同步日志" class="headerlink" title="4、分析同步日志"></a>4、分析同步日志</h2><blockquote>
+<p>7001 Redis，master结点</p>
+</blockquote>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_21-43-03.png"></p>
+<blockquote>
+<p>7003 Redis，slave结点</p>
+</blockquote>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_21-31-07.png"></p>
+<h2 id="5、数据主从同步问题"><a href="#5、数据主从同步问题" class="headerlink" title="5、数据主从同步问题"></a>5、数据主从同步问题</h2><p><code>repl_baklog</code>文件，是用<code>循环数组</code>实现的，如果<code>slave</code>节点长时间断开或者发生宕机长时间没有恢复，<code>master</code>节点可能会覆盖掉之前<code>slave</code>节点还没有同步的数据，<code>导致数据丢失</code>，只能通过<code>全量同步</code>进行恢复数据</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_22-13-51.png"></p>
+<p>优化Redis主从集群</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_22-17-06.png"></p>
+<p>总结</p>
+<p><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/Snipaste_2024-10-20_22-18-30.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Urstdog</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/categories/redis/6/">http://example.com/categories/redis/6/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Urstdog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Redis%E6%90%AD%E5%BB%BA%E4%B8%BB%E4%BB%8E%E6%A1%86%E6%9E%B6/">Redis搭建主从框架</a></div><div class="post_share"><div class="social-share" data-image="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/categories/java/2/" title="synchronized锁和@Transactional注解失效"><img class="cover" src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">synchronized锁和@Transactional注解失效</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Urstdog</div><div class="author-info__description">Hello World!</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Urstdog"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">他强任他强，清风拂山岗！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81Redis%E4%B8%BB%E4%BB%8E%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84"><span class="toc-text">1、Redis主从框架结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%BB%E4%BB%8E%E6%A1%86%E6%9E%B6%EF%BC%9F"><span class="toc-text">2、如何搭建主从框架？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E4%B8%8D%E5%90%8C%E7%AB%AF%E5%8F%A3%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">1、不同端口搭建Redis主从框架</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81Centos7%E5%AE%89%E8%A3%85redis"><span class="toc-text">1、Centos7安装redis</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81redis-conf-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">2、redis.conf 配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E5%90%AF%E5%8A%A8%E8%BF%99%E4%B8%89%E4%B8%AARedis%E5%AE%9E%E4%BE%8B"><span class="toc-text">3、启动这三个Redis实例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E9%85%8D%E7%BD%AE%E4%B8%BB%E4%BB%8E%E5%85%B3%E7%B3%BB"><span class="toc-text">4、配置主从关系</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E5%8E%9F%E7%90%86"><span class="toc-text">3、主从数据同步原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E5%88%86%E6%9E%90%E5%90%8C%E6%AD%A5%E6%97%A5%E5%BF%97"><span class="toc-text">4、分析同步日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E6%95%B0%E6%8D%AE%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E9%97%AE%E9%A2%98"><span class="toc-text">5、数据主从同步问题</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/6/" title="Redis搭建主从框架"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redis搭建主从框架"/></a><div class="content"><a class="title" href="/categories/redis/6/" title="Redis搭建主从框架">Redis搭建主从框架</a><time datetime="2024-10-20T16:40:08.210Z" title="发表于 2024-10-21 00:40:08">2024-10-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/java/2/" title="synchronized锁和@Transactional注解失效"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/cb88-java-logo-001.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="synchronized锁和@Transactional注解失效"/></a><div class="content"><a class="title" href="/categories/java/2/" title="synchronized锁和@Transactional注解失效">synchronized锁和@Transactional注解失效</a><time datetime="2024-10-14T13:27:39.856Z" title="发表于 2024-10-14 21:27:39">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/4/" title="Redis存储java对象"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redis存储java对象"/></a><div class="content"><a class="title" href="/categories/redis/4/" title="Redis存储java对象">Redis存储java对象</a><time datetime="2024-10-14T13:27:08.717Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/5/" title="Redission"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Redission"/></a><div class="content"><a class="title" href="/categories/redis/5/" title="Redission">Redission</a><time datetime="2024-10-14T13:27:08.700Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/categories/redis/3/" title="Lua脚本"><img src="https://urstdog-blog.oss-cn-hangzhou.aliyuncs.com/image/2024-10-9193940.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lua脚本"/></a><div class="content"><a class="title" href="/categories/redis/3/" title="Lua脚本">Lua脚本</a><time datetime="2024-10-14T13:27:08.684Z" title="发表于 2024-10-14 21:27:08">2024-10-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Urstdog</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
